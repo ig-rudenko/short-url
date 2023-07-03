@@ -10,19 +10,8 @@ RUN go mod download
 # Копируем исходный код приложения
 COPY . .
 
-# Собираем бинарный файл приложения с отключением CGO
-RUN CGO_ENABLED=0 go build -o short-url ./cmd/app/main.go
-
-# Стадия запуска
-FROM alpine
-
-# Копируем бинарный файл из стадии сборки
-COPY --from=builder /app/short-url /app/short-url
-
-WORKDIR /app
-
-# Задаем переменную окружения для порта HTTP
-ENV HTTP_PORT 8000
+# Собираем бинарный файл приложения
+RUN go build -o short-url /app/cmd/app/main.go;
 
 EXPOSE 8000
 
