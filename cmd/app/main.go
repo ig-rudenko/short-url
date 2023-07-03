@@ -39,7 +39,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/url", handlers.New(log, storage))
+	router.Post("/url", handlers.SaveURL(log, storage))
 
 	server := &http.Server{
 		Addr:         cfg.Address,

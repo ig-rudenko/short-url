@@ -24,13 +24,14 @@ type Response struct {
 	Alias string `json:"alias,omitempty"`
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLManager
 type URLManager interface {
 	SaveUrl(url_ string, alias string) error
 	GetUrl(alias string) (string, error)
 	DeleteUrl(alias string) error
 }
 
-func New(log *slog.Logger, urlManager URLManager) http.HandlerFunc {
+func SaveURL(log *slog.Logger, urlManager URLManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.save.New"
 
