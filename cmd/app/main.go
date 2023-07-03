@@ -40,6 +40,8 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Post("/url", handlers.SaveURL(log, storage))
+	router.Get("/{alias}", handlers.Redirect(log, storage))
+	router.Delete("/{alias}", handlers.DeleteURL(log, storage))
 
 	server := &http.Server{
 		Addr:         cfg.Address,

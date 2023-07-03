@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/slog"
@@ -24,21 +23,9 @@ type Response struct {
 	Alias string `json:"alias,omitempty"`
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLManager
-type URLManager interface {
-	SaveUrl(url_ string, alias string) error
-	GetUrl(alias string) (string, error)
-	DeleteUrl(alias string) error
-}
-
 func SaveURL(log *slog.Logger, urlManager URLManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.url.save.New"
-
-		log = log.With(
-			slog.String("op", op),
-			slog.String("request_id", middleware.GetReqID(r.Context())),
-		)
+		log = getHandlerLogger(log, "handlers.SaveURL", r)
 
 		var req Request
 
@@ -62,12 +49,13 @@ func SaveURL(log *slog.Logger, urlManager URLManager) http.HandlerFunc {
 		}
 
 		err = urlManager.SaveUrl(req.URL, alias)
-		if errors.Is(err, storage.ErrURLExists) {
-			log.Info("URL под таким именем уже существует", slog.String("url", req.URL))
-			render.JSON(w, r, resp.Error("URL под таким именем уже существует"))
-			return
-		}
+
 		if err != nil {
+			if errors.Is(err, storage.ErrURLExists) {
+				log.Info("URL под таким именем уже существует", slog.String("url", req.URL))
+				render.JSON(w, r, resp.Error("URL под таким именем уже существует"))
+				return
+			}
 			log.Error("failed to add url", sl.Err(err))
 			render.JSON(w, r, resp.Error("failed to add url"))
 			return
