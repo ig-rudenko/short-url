@@ -22,7 +22,7 @@ type HttpServer struct {
 func Load() *Config {
 	config := os.Getenv("CONFIG")
 	if config == "" {
-		log.Fatal("Переменная окружения \"CONFIG\" не была указана")
+		config = "./config/local.yaml"
 	}
 
 	if _, err := os.Stat(config); os.IsNotExist(err) {
