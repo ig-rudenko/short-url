@@ -51,7 +51,6 @@ func Test_SaveRedirect(t *testing.T) {
 			url:   gofakeit.URL(),
 			alias: "",
 		},
-		// TODO: add more test cases
 	}
 
 	for _, tc := range testCases {
