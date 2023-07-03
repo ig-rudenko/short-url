@@ -53,7 +53,7 @@ func Test_SaveRedirect(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
 			e := httpexpect.Default(t, hostUrl.String())
@@ -85,19 +85,20 @@ func Test_SaveRedirect(t *testing.T) {
 			} else {
 				resp.Value("alias").String().NotEmpty()
 
-				tc.alias = resp.Value("alias").String().Raw()
+				// Добавляем сгенерированный alias
+				testCases[i].alias = resp.Value("alias").String().Raw()
 			}
 
 			// Redirect
-			testRedirect(t, tc.alias, tc.url)
+			testRedirect(t, testCases[i].alias, tc.url)
 
 		})
 	}
 
 	// Delete Aliases
 	for _, tc := range testCases {
-		if tc.error != "" {
-			t.Run(tc.name, func(t *testing.T) {
+		if tc.error == "" {
+			t.Run(tc.name+" delete", func(t *testing.T) {
 				tc := tc
 				t.Parallel()
 				e := httpexpect.Default(t, hostUrl.String())
