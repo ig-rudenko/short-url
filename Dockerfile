@@ -23,5 +23,4 @@ WORKDIR /app
 
 EXPOSE 8000
 
-# Запускаем приложение
 ENTRYPOINT ["./short-url"]
